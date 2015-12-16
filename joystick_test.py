@@ -1,21 +1,23 @@
+from __future__ import print_function
+
 import pygame, sys, time, os, atexit
 from pygame.locals import *
 from sense_hat import SenseHat
 
-os.environ["SDL_VIDEODRIVER"] = "dummy"
+#os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 hmov = [0, 1, 2, 3, 4, 5, 6, 7]
 vmov = [0, 1, 2, 3, 4, 5, 6, 7]
 LED_COLOR = (255, 0, 0)
 
+pygame.init()
+#pygame.display.set_mode()
+#pygame.display.init()
+pygame.display.set_mode((640, 480))
 #screen = pygame.display.set_mode((1,1))
 
 sense = SenseHat()
 sense.clear()
-
-pygame.init()
-pygame.display.set_mode()
-pygame.display.init()
 
 def goodbye(name):
     print('Goodbye, %s' % name)

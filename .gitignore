@@ -61,3 +61,4 @@ target/
 
 apollo_example
 examples
+.ipynb_checkpoints
