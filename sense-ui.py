@@ -21,7 +21,9 @@ def quit():
 def activateScreen(idx):
     global screen
     
-    if idx > screen[0]:
+    if idx == screen[0]:
+        pass
+    elif idx > screen[0]:
         # go right
         screen = screen[1:] + screen[:1]
     else:
@@ -44,14 +46,24 @@ def eventIterator():
             yield stick.read()
         else:
             yield False
-        
 
+def move():
+    sense.set_rotation(0, False)
+
+    for x in range(1, 8):
+        for y in range(0, 8):
+            picolor = sense.get_pixel(x, y)
+            sense.set_pixel(x - 1, y, picolor);
+    sense.set_rotation(0, False)
+    
 def main():
     try:
+        activateScreen(1)
+        
         for event in eventIterator():
-            time.sleep(0.1)
-
-            if event != False and event.state == 1:
+            time.sleep(0.2)
+            move()
+            if event and event.state == 1:
                 key = int(event.key)
                 if key == stick.KEY_LEFT:
                     activateScreen(screen[0] - 1)
@@ -66,10 +78,10 @@ def main():
                 cpuload.check()
 
             if screen[0] == 2:
-                diskio.check()
+                diskio.check('read')
 
             if screen[0] == 3:
-                pass
+                diskio.check('write')
             
             if screen[0] == 4:
                 pass

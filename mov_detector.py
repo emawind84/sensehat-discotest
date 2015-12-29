@@ -16,8 +16,8 @@ def detected(d):
     data = {'value1': round(d[0], 3), 
             'value2': round(d[1], 3),
             'value3': round(d[2], 3)}
-    maker_request.send('mov_detected', data)
-    time.sleep(5)
+    #maker_request.send('mov_detected', data)
+    #time.sleep(5)
     
 def show_led():
     while True:
@@ -32,9 +32,10 @@ def goodbye(name):
     sense.clear()
     print('Goodbye, %s' % name)
     
-def main():
+def run():
+    global first
+    
     dd = 0
-
     while True:  
         acc = sense.get_accelerometer_raw()
         d = (abs(first['x'] - acc['x']), 
@@ -53,8 +54,15 @@ def main():
         if dd >= 2:
             detected(d)
             dd = 0
+            first = acc
             
         time.sleep(0.1)
+    
+def main():
+    try:
+        run()
+    except (KeyboardInterrupt, SystemExit):
+        pass
     
 atexit.register(goodbye, name='Emanuele')
 

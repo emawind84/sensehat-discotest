@@ -52,7 +52,11 @@ class SenseStick(object):
     def __iter__(self):
         while True:
             event = self.stick_file.read(self.EVENT_SIZE)
+            
             (tv_sec, tv_usec, type, code, value) = struct.unpack(self.EVENT_FORMAT, event)
+            
+            print(code, value)
+            
             if type == self.EV_KEY:
                 yield InputEvent(tv_sec + (tv_usec / 1000000), code, value)
 

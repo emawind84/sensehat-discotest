@@ -20,6 +20,14 @@ red = (255, 0, 0)
 orange = (255, 190, 0)
 
 lvl = [green, green, orange, orange, red, red, red, red]
+
+def move():
+    sense.set_rotation(180, False)
+
+    for x in range(6, -1, -1):
+        for y in range(0, 8):
+            picolor = sense.get_pixel(x, y)
+            sense.set_pixel(x + 1, y, picolor);
     
 def check(cpu=None):
     sense.set_rotation(270, False)
@@ -31,11 +39,11 @@ def check(cpu=None):
     
     for i in range(0, cpu + 1):
         #print(i)
-        sense.set_pixel(i, 0, lvl[cpu])
+        sense.set_pixel(i, 7, lvl[cpu])
         
     for i in range(cpu + 1, 8):
         #print(i)
-        sense.set_pixel(i, 0, 0, 0, 0)
+        sense.set_pixel(i, 7, 0, 0, 0)
         
     sense.set_rotation(0, False)
 

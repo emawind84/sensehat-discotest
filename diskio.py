@@ -65,30 +65,21 @@ def poll(interval):
 
     return (processes, disks_read_per_sec, disks_write_per_sec)
 
-def check():
+def check(type='read'):
     sense.set_rotation(270, False)
     
     ret = poll(1)
-    read = int(min(ret[1], MAX_READ_BYTES) * 7 // MAX_READ_BYTES)
-    write = int(min(ret[2], MAX_WRITE_BYTES) * 7 // MAX_WRITE_BYTES)
+    idx = 1 if type == 'read' else 2
+    read = int(min(ret[idx], MAX_READ_BYTES) * 7 // MAX_READ_BYTES)
     
     # reading leds
     for i in range(read + 1, 8):
         #print(i)
-        sense.set_pixel(i, 3, 0, 0, 0)
+        sense.set_pixel(i, 7, 0, 0, 0)
         
     for i in range(0, read + 1):
         #print(i)
-        sense.set_pixel(i, 3, lvl[read])
-        
-    # writing leds
-    for i in range(write + 1, 8):
-        #print(i)
-        sense.set_pixel(i, 4, 0, 0, 0)
-        
-    for i in range(0, write + 1):
-        #print(i)
-        sense.set_pixel(i, 4, lvl[write])
+        sense.set_pixel(i, 7, lvl[read])
     
     sense.set_rotation(0, False)
 
