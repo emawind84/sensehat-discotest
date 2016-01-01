@@ -19,7 +19,7 @@ header = ['temp_h', 'temp_p', 'humidity', 'pressure',
 pylog.FILE_NAME = 'senselog.csv'
 #pylog.WRITE_FREQ = 1
 
-timed_log_stop= Event()
+timed_log_stop = Event()
 
 def quit():
     timed_log_stop.set()

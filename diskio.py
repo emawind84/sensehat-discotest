@@ -82,6 +82,12 @@ def check(type='read'):
         sense.set_pixel(i, 7, lvl[read])
     
     sense.set_rotation(0, False)
+    
+def checkWrite():
+    check('write')
+    
+def checkRead():
+    check('read')
 
 def main():
     try:
