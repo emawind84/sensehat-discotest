@@ -3,7 +3,11 @@
 from sense_hat import SenseHat
 from datetime import datetime
 from threading import Thread, Event
-import time, pylog, sys
+import time, pylog, sys, argparse, json
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-j', '--json', action='store_true', dest='jsonout', help='Print data out on console')
+args = parser.parse_args()
 
 DELAY = 300
 
@@ -50,7 +54,7 @@ def get_sense_data():
     gyro = sense.get_gyroscope_raw()
     sense_data.extend([gyro['x'], gyro['y'], gyro['z']])
     
-    sense_data.append(datetime.now())
+    sense_data.append(str(datetime.now()))
     
     return sense_data
 
@@ -84,4 +88,10 @@ def main():
         quit()
 
 if __name__ == '__main__':
-    main()
+    if args.jsonout:
+        data = get_sense_data()
+        data = {k: v for (k,v) in zip(header, data)}
+        #print(data)
+        print(json.dumps(data))
+    else:
+        main()
