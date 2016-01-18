@@ -59,7 +59,8 @@ target/
 ## DISCO IGNORE LIST HERE
 ## --------------------------------------
 
-apollo_example
-examples
+apollo_example/
+examples/
 .ipynb_checkpoints
 senselog*.csv
+log/
