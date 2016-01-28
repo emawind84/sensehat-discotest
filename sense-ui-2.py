@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 from __future__ import division, print_function
 
-import sys, time, os, atexit, cpuload, diskio, christmas, christmas2
+import sys, time, os, atexit, cpuload, diskio, christmas, christmas2, logging
 from sense_hat import SenseHat, SenseStick
 from threading import Thread, Event
 
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=logging.INFO)
+#logger = logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# define the number of screens the ui will manage
 screen = [1, 2, 3, 4, 5, 6, 7, 8]
 
 sense = SenseHat()
@@ -24,20 +30,20 @@ def init_processes():
     global procs
     # define here processes to run on the screens
     procs = { 
-        1: (move, cpuload.check),
-        2: (move, diskio.checkRead),
-        3: (move, diskio.checkWrite),
+        1: (cpuload.check, move),
+        2: (diskio.checkRead, move),
+        3: (diskio.checkWrite, move),
         4: (christmas2.show_frame,),
         5: (christmas.show_frame,)
     }
     
 def no_process():
-    print('No process set for the screen %s' % screen[0])
+    logger.info('No process set for the screen %s' % screen[0])
     sense.rotation = 0
     sense.set_pixel(screen[0] - 1, 0, (255, 0, 0))
 
 def quit():
-    print('Bye bye!')
+    logger.info('Bye bye!')
     time.sleep(1)
     
     # stop thread in background
@@ -48,7 +54,7 @@ def quit():
 
 def activateScreen(idx):
     global screen
-    print('Activating screen %s...' % screen[0] )
+    logger.info('Activating screen %s...' % screen[0] )
     
     # stop thread in background
     stop_process()
@@ -66,7 +72,7 @@ def activateScreen(idx):
     
 
 def showActiveScreen():
-    print('Screen active: %s' % screen[0])
+    logger.info('Screen active: %s' % screen[0])
     
     pause_process()
     
@@ -94,7 +100,7 @@ def move():
     sense.set_rotation(0, False)
 
 def run_process(arg1, stop_event):
-    print('Starting process on screen %s...' % screen[0] )
+    logger.info('Starting process on screen %s...' % screen[0] )
     global proc_running
     proc_running = True
     
@@ -109,7 +115,7 @@ def run_process(arg1, stop_event):
     proc_running = False
         
 def stop_process():
-    print('Stopping process on screen %s...' % screen[0] )
+    logger.info('Stopping process on screen %s...' % screen[0] )
     # stop thread in background
     proc_stop.set()
     
@@ -121,11 +127,11 @@ def stop_process():
     sense.clear()
     
 def pause_process():
-    print('Pausing process on screen %s...' % screen[0] )
+    logger.info('Pausing process on screen %s...' % screen[0] )
     proc_pause.set()
     
 def unpause_process():
-    print('Unpausing process on screen %s...' % screen[0] )
+    logger.info('Unpausing process on screen %s...' % screen[0] )
     proc_pause.clear()
         
 def main():    

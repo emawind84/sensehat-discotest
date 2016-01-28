@@ -3,10 +3,16 @@
 from sense_hat import SenseHat
 from datetime import datetime
 from threading import Thread, Event
-import time, pylog, sys, argparse, json
+from pylog import PyLog
+import time, sys, argparse, json, logging, atexit
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=logging.INFO)
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.INFO)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-j', '--json', action='store_true', dest='jsonout', help='Print data out on console')
+parser.add_argument('-j', '--json', action='store_true', dest='jsonout', help='print data directly on console')
+parser.add_argument('-l', '--log', action='store', dest='logfile', help='use this log file for logging data')
 args = parser.parse_args()
 
 DELAY = 300
@@ -20,6 +26,7 @@ header = ['temp_h', 'temp_p', 'humidity', 'pressure',
           'gyro_x', 'gyro_y', 'gyro_z',
           'timestamp']
 
+pylog = PyLog()
 pylog.FILE_NAME = 'senselog.csv'
 #pylog.WRITE_FREQ = 1
 
@@ -27,7 +34,6 @@ timed_log_stop = Event()
 
 def quit():
     timed_log_stop.set()
-    time.sleep(1)
     sys.exit()
 
 def get_sense_data():
@@ -59,12 +65,17 @@ def get_sense_data():
     return sense_data
 
 
-def timed_log(arg1, stop_event):
+def timed_log(stop_event):
     global sense_data
     
-    while True and not stop_event.is_set():
+    while not stop_event.is_set():
         pylog.log_data(sense_data)
-        time.sleep(DELAY)
+        
+        # wait for the delay but check every 0.2s if the thread has been stopped
+        for i in range(int(DELAY//0.2)):
+            time.sleep(0.2)
+            if stop_event.is_set():
+                break
 
 def main():
     global sense_data
@@ -74,7 +85,8 @@ def main():
         
         if DELAY > 0:
             sense_data = get_sense_data()
-            Thread(target=timed_log, args=(1, timed_log_stop)).start()
+            t = Thread(target=timed_log, args=(timed_log_stop,))
+            t.start()
         
         while True:
             time.sleep(0.1)
@@ -88,6 +100,9 @@ def main():
         quit()
 
 if __name__ == '__main__':
+    if args.logfile:
+        pylog.FILE_NAME = args.logfile
+        
     if args.jsonout:
         data = get_sense_data()
         data = {k: v for (k,v) in zip(header, data)}

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 from sense_hat import SenseHat
-import time, maker_request, atexit, pylog
+from pylog import PyLog
+import time, maker_request, atexit
 
 sense = SenseHat()
 sense.clear()
@@ -9,6 +10,7 @@ sense.clear()
 first = sense.get_accelerometer_raw()
 diff = 0.005
 active = True
+pylog = PyLog(filename='log/mov_detector.log')
 
 def detected(d):
     print('detected movemement!')
