@@ -26,25 +26,38 @@ proc_pause = Event()
 
 procs = {}
 
+class SenseRunnable(object):
+    """This class is a wrapper for the process that will be executed on the display"""
+    
+    def __init__(self, _run, with_shift=False):
+        self._run = _run
+        self.with_shift = with_shift
+    
+    def run(self):
+        self._run()
+        if self.with_shift:
+            move()
+
 def init_processes():
     global procs
     # define here processes to run on the screens
     procs = { 
-        1: (cpuload.check, move),
-        2: (diskio.checkRead, move),
-        3: (diskio.checkWrite, move),
-        4: (christmas2.show_frame,),
-        5: (christmas.show_frame,)
+        1: SenseRunnable(cpuload.check, with_shift=True),
+        2: SenseRunnable(diskio.checkRead, with_shift=True),
+        3: SenseRunnable(diskio.checkWrite, with_shift=True),
+        4: SenseRunnable(christmas2.show_frame),
+        5: SenseRunnable(christmas.show_frame)
     }
     
 def no_process():
     logger.info('No process set for the screen %s' % screen[0])
     sense.rotation = 0
     sense.set_pixel(screen[0] - 1, 0, (255, 0, 0))
+    
+    time.sleep(1)
 
 def quit():
     logger.info('Bye bye!')
-    time.sleep(1)
     
     # stop thread in background
     stop_process()
@@ -107,9 +120,8 @@ def run_process(arg1, stop_event):
     while True and not stop_event.is_set():
         if not proc_pause.is_set():
             # run process here
-            for p in procs.get(screen[0], (no_process,)):
-                p()
-            
+            procs.get(screen[0], SenseRunnable(no_process)).run()
+                        
         time.sleep(0.2)
         
     proc_running = False

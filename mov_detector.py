@@ -18,8 +18,8 @@ def detected(d):
     data = {'value1': round(d[0], 3), 
             'value2': round(d[1], 3),
             'value3': round(d[2], 3)}
-    #maker_request.send('mov_detected', data)
-    #time.sleep(5)
+    maker_request.send('mov_detected', data)
+    time.sleep(5)
     
 def show_led():
     while True:
