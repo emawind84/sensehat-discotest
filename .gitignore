@@ -64,3 +64,4 @@ examples/
 .ipynb_checkpoints
 senselog*.csv
 log/
+*.pyc

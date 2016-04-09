@@ -112,7 +112,7 @@ def move():
             sense.set_pixel(x - 1, y, picolor);
     sense.set_rotation(0, False)
 
-def run_process(arg1, stop_event):
+def run_process(stop_event):
     logger.info('Starting process on screen %s...' % screen[0] )
     global proc_running
     proc_running = True
@@ -168,7 +168,7 @@ def main():
 
             if proc_stop.is_set():
                 proc_stop.clear()
-                Thread(target=run_process, args=(1, proc_stop)).start()
+                Thread(target=run_process, args=(proc_stop,)).start()
         
     except (KeyboardInterrupt, SystemExit):
         quit()
