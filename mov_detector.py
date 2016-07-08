@@ -8,17 +8,19 @@ sense = SenseHat()
 sense.clear()
 
 first = sense.get_accelerometer_raw()
-diff = 0.005
+diff = 0.01
 active = True
 pylog = PyLog(filename='log/mov_detector.log')
 
 def detected(d):
     print('detected movemement!')
     pylog.log('Detected movement x: %s, y: %s, z: %s' % d)
+    '''
     data = {'value1': round(d[0], 3), 
             'value2': round(d[1], 3),
             'value3': round(d[2], 3)}
     maker_request.send('mov_detected', data)
+    '''
     time.sleep(5)
     
 def show_led():

@@ -10,11 +10,6 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=log
 _logger = logging.getLogger(__name__)
 _logger.setLevel(logging.INFO)
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-j', '--json', action='store_true', dest='jsonout', help='print data directly on console')
-parser.add_argument('-l', '--log', action='store', dest='logfile', help='use this log file for logging data')
-args = parser.parse_args()
-
 DELAY = 300
 
 sense = SenseHat()
@@ -100,6 +95,11 @@ def main():
         quit()
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-j', '--json', action='store_true', dest='jsonout', help='print data directly on console')
+    parser.add_argument('-l', '--log', action='store', dest='logfile', help='use this log file for logging data')
+    args = parser.parse_args()
+
     if args.logfile:
         pylog.FILE_NAME = args.logfile
         
