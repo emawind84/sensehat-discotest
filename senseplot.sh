@@ -12,4 +12,4 @@ echo "Script name: $SCRIPT_NAME"
 
 cd $SCRIPT_BASE_PATH
 
-python senseplot.py $1
+python senseplot_es.py $1

@@ -4,11 +4,7 @@ from sense_hat import SenseHat
 from datetime import datetime
 from threading import Thread, Event
 from pylog import PyLog
-import time, sys, argparse, json, logging, atexit
-
-logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=logging.INFO)
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.INFO)
+import time, sys, json, atexit
 
 DELAY = 300
 
@@ -56,7 +52,6 @@ def get_sense_data():
     sense_data.extend([gyro['x'], gyro['y'], gyro['z']])
     
     sense_data.append(str(datetime.now()))
-    _logger.debug(sense_data)
     
     return sense_data
 
@@ -79,33 +74,20 @@ def main():
     try:
         pylog.set_header(header)
         
-        if DELAY > 0:
-            sense_data = get_sense_data()
-            t = Thread(target=timed_log, args=(timed_log_stop,))
-            t.start()
+        sense_data = get_sense_data()
+        t = Thread(target=timed_log, args=(timed_log_stop,))
+        t.start()
         
         while True:
             time.sleep(1)
             sense_data = get_sense_data()
             
-            if DELAY == 0:
-                pylog.log_data(sense_data)
-            
     except (KeyboardInterrupt, SystemExit):
         quit()
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-j', '--json', action='store_true', dest='jsonout', help='print data directly on console')
-    parser.add_argument('-l', '--log', action='store', dest='logfile', help='use this log file for logging data')
-    args = parser.parse_args()
 
-    if args.logfile:
-        pylog.FILE_NAME = args.logfile
+    if len(sys.argv) > 1:
+        pylog.FILE_NAME = sys.argv[1]
         
-    if args.jsonout:
-        data = get_sense_data()
-        data = {k: v for (k,v) in zip(header, data)}
-        print(json.dumps(data))
-    else:
-        main()
+    main()

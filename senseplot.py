@@ -38,7 +38,7 @@ def main():
         for row in reader:
             _logger.debug(row)
             #x.append(datetime.strptime( row[16], "%Y-%m-%d %H:%M:%S.%f"))
-            x.append(datetime.strptime( row[16], "%Y-%m-%d %H:%M:%S"))
+            x.append(datetime.strptime( row[16], "%Y-%m-%dT%H:%M:%S.%f"))
             y.append(row[CSV_MAP.get(plotdata, 0)])
         
         plt.plot(x, y)
