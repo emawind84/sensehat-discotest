@@ -8,9 +8,9 @@ sense = SenseHat()
 sense.clear()
 
 first = sense.get_accelerometer_raw()
-diff = 0.01
+diff = 0.1
 active = True
-pylog = PyLog(filename='log/mov_detector.log')
+pylog = PyLog(filename='log/mov_detector.log', write_freq=1)
 
 def detected(d):
     print('detected movemement!')
@@ -58,7 +58,6 @@ def run():
         if dd >= 2:
             detected(d)
             dd = 0
-            first = acc
             
         time.sleep(0.1)
     
