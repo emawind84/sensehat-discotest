@@ -43,7 +43,10 @@ def main():
             # format the date with the offset in order to index the correct date
             data['timestamp'] = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
             
-            r = s.put( "http://%s:%s/%s/%s/%s" % 
+            # let's prevent es from overwriting (creating new version) the same data if already exists
+            # add the querystring: "op_type=create" to prevent from creating new version
+            # https://www.elastic.co/guide/en/elasticsearch/guide/current/create-doc.html#create-doc
+            r = s.put( "http://%s:%s/%s/%s/%s?op_type=create" % 
                       (ES_HOST, ES_PORT, ES_INDEX, ES_TYPE, data['timestamp']), 
                       data=json.dumps(data))
             _logger.debug(r.text)

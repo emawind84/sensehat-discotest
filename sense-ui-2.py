@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division, print_function
 
-import sys, time, os, atexit, cpuload, diskio, christmas, christmas2, logging
+import sys, time, os, atexit, cpuload, diskio, christmas, christmas2, logging, ciao
 from sense_hat import SenseHat, SenseStick
 from threading import Thread, Event
 
@@ -46,7 +46,8 @@ def init_processes():
         2: SenseRunnable(diskio.checkRead, with_shift=True),
         3: SenseRunnable(diskio.checkWrite, with_shift=True),
         4: SenseRunnable(christmas2.show_frame),
-        5: SenseRunnable(christmas.show_frame)
+        5: SenseRunnable(christmas.show_frame),
+        6: SenseRunnable(ciao.show_frame)
     }
     
 def no_process():
