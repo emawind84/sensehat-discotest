@@ -1,5 +1,5 @@
 from sense_hat import SenseHat
-import time
+import time, sys
 
 sh=SenseHat()
 
