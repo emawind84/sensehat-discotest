@@ -44,7 +44,7 @@ def main():
             "timestamp": { "order": "asc" }
         }]
     }
-    result = s.get('http://203.239.21.69:9200/sense/stats/_search', data=json.dumps(query))
+    result = s.get('http://localhost:9200/sense/stats/_search', data=json.dumps(query))
     jresult = result.json()
     datalist = jresult['hits']['hits']
 

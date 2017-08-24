@@ -14,7 +14,7 @@ def eventIterator():
 def reboot():
     time.sleep(1)
     print("Rebooting system...")
-    subprocess.call(['shutdown', '-r', '0'])
+    subprocess.Popen(['shutdown', '-r', '0'])
     sys.exit()
     
 def quit():

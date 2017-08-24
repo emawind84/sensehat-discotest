@@ -1,0 +1,76 @@
+{
+  "mappings": {
+    "stats": {
+      "properties": {
+        "acc_x": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "acc_y": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "acc_z": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "gyro_x": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "gyro_y": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "gyro_z": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "humidity": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "mag_x": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "mag_y": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "mag_z": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "pitch": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "pressure": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "roll": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "temp_h": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "temp_p": {
+          "type": "float",
+          "index": "not_analyzed"
+        },
+        "timestamp": {
+          "type": "date",
+          "format": "strict_date_optional_time||epoch_millis"
+        },
+        "yaw": {
+          "type": "float",
+          "index": "not_analyzed"
+        }
+      }
+    }
+  }
+}
