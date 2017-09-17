@@ -1,9 +1,29 @@
 #!/usr/bin/env python
+"""Tiny UI for Sense Hat where you can attach 
+and view on the matrix screen any data you want. 
+Just add your program as a SenseRunnable and there you go!"""
+
 from __future__ import division, print_function
 
-import sys, time, os, atexit, cpuload, diskio, christmas, christmas2, logging, ciao, merrychristmas
+import sys
+import time
+import os
 from sense_hat import SenseHat, SenseStick
 from threading import Thread, Event
+import cpuload
+import diskio
+import christmas
+import christmas2
+import logging
+import ciao
+import merrychristmas
+
+__author__ = "Emanuele Disco"
+__copyright__ = "Copyright 2017"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__email__ = "emanuele.disco@gmail.com"
+__status__ = "Production"
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=logging.INFO)
 #logger = logging
@@ -121,7 +141,7 @@ def run_process(stop_event):
     
     while True and not stop_event.is_set():
         if not proc_pause.is_set():
-            # run process here
+            # run process here default to no_process
             procs.get(screen[0], SenseRunnable(no_process)).run()
                         
         time.sleep(0.2)

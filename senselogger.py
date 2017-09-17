@@ -1,10 +1,22 @@
 #!/usr/bin/env python
 
+import time
+import sys
+import argparse
+import json
+import logging
+import atexit
 from sense_hat import SenseHat
 from datetime import datetime
 from threading import Thread, Event
 from pylog import PyLog
-import time, sys, argparse, json, logging, atexit
+
+__author__ = "Emanuele Disco"
+__copyright__ = "Copyright 2017"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__email__ = "emanuele.disco@gmail.com"
+__status__ = "Production"
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=logging.INFO)
 _logger = logging.getLogger(__name__)
@@ -21,8 +33,7 @@ header = ['temp_h', 'temp_p', 'humidity', 'pressure',
           'gyro_x', 'gyro_y', 'gyro_z',
           'timestamp']
 
-pylog = PyLog()
-pylog.FILE_NAME = 'senselog.csv'
+pylog = PyLog(filename='senselog.csv')
 #pylog.WRITE_FREQ = 1
 
 timed_log_stop = Event()

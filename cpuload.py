@@ -13,7 +13,7 @@ sense = SenseHat()
 #sense.set_rotation(270, False)
 #sense.flip_v()
 
-MAX_CPU_LOAD = 80
+MAX_CPU_LOAD = 90
 
 green = (55, 255, 0)
 red = (255, 0, 0)

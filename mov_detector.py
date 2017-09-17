@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""Detect acceleration anomalies using Sense Hat, 
+logging and sending notification via Twitter and Maker.
+Data are saved on Elasticsearch engine."""
 
 from __future__ import print_function
 
@@ -13,12 +16,22 @@ import maker_request
 import es_data_import
 from pylog import PyLog
 from datetime import datetime
+from ttytter import Ttytter
+
+__author__ = "Emanuele Disco"
+__copyright__ = "Copyright 2017"
+__license__ = "GPL"
+__version__ = "1.0.0"
+__email__ = "emanuele.disco@gmail.com"
+__status__ = "Production"
 
 sense = SenseHat()
 sense.clear()
 
 min_difference = 0.005
 anomalies_detected = False
+anomalies = 0
+current_data = []
 stop_event = Event()
 pylog = PyLog(filename='log/mov_detector.log', write_freq=10)
 
@@ -27,20 +40,11 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s')
 _logger = logging.getLogger(__name__)
 _logger.setLevel(logging.INFO)
 
-def log_anomaly(d):
+def log_to_file(d):
     _logger.debug('Logging anomalies...')
-    pylog.log('Detected movement x: %s, y: %s, z: %s' % d)
-    '''
-    data = {'value1': round(d[0], 3), 
-            'value2': round(d[1], 3),
-            'value3': round(d[2], 3)}
-    maker_request.send('mov_detected', data)
-    '''
-    #time.sleep(5)
+    pylog.log('Detected movement x: %s, y: %s, z: %s' % (d['x'], d['y'], d['z']))
     
 def show_led(stop_event):
-    global anomalies_detected
-    
     while True and not stop_event.is_set():
         time.sleep(0.1)
         if not anomalies_detected:
@@ -49,8 +53,37 @@ def show_led(stop_event):
         time.sleep(0.1)
         sense.set_pixel(0, 0, 0, 0, 0)
         _logger.debug('Led On')
+
+def send_maker_notification(stop_event):
+    while True and not stop_event.is_set():
+        time.sleep(0.1)
+        if not anomalies_detected:
+            continue
+
+        if anomalies > 20:
+            data = {'value1': round(current_data['x'], 5), 
+                    'value2': round(current_data['y'], 5),
+                    'value3': round(current_data['z'], 5)
+                    }
+            maker_request.send('mov_detected', data)
         
-def create_es_index(d):
+def send_twitter_msg(stop_event):
+    while True and not stop_event.is_set():
+        time.sleep(0.1)
+        if not anomalies_detected:
+            continue
+            
+        if anomalies > 10:
+            Ttytter().send('Detected %s acceleration anomalies %06.5fg, %06.5fg, %06.5fg.' 
+                           % (anomalies, 
+                              current_data['x'], 
+                              current_data['y'], 
+                              current_data['z']
+                             )
+                          )
+            time.sleep(30)
+        
+def log_to_es(d):
     d['timestamp'] = str(datetime.utcnow().isoformat())
     es_data_import.post('sense_acc', 'data', d)
 
@@ -61,12 +94,14 @@ def do_before_exit():
     
 def run():
     global anomalies_detected
+    global anomalies
+    global current_data
     
     mean_acc = sense.get_accelerometer_raw()
     anomalies = 0
     
     while True:  
-        acc = sense.get_accelerometer_raw()
+        current_data = acc = sense.get_accelerometer_raw()
         d = (abs(mean_acc['x'] - acc['x']), 
              abs(mean_acc['y'] - acc['y']), 
              abs(mean_acc['z'] - acc['z']))
@@ -84,10 +119,10 @@ def run():
         if anomalies >= 2:
             _logger.debug('Anomalies detected')
             anomalies_detected = True
-            log_anomaly(d)
-            create_es_index(acc)
+            log_to_file(acc)
+            log_to_es(acc)
             
-        time.sleep(0.1)
+        time.sleep(0.01)
     
 def main():
     _parser = argparse.ArgumentParser()
@@ -98,8 +133,14 @@ def main():
         _logger.setLevel(logging.DEBUG)
         
     try:
-        # sub thread
+        # red led on sense hat matrix
         Thread(target=show_led, args=(stop_event,)).start()
+        
+        # twitter alert
+        #Thread(target=send_twitter_msg, args=(stop_event,)).start()
+
+        # maker alert
+        Thread(target=send_maker_notification, args=(stop_event,)).start()
         
         # main thread
         run()
