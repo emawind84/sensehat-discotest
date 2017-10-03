@@ -28,7 +28,7 @@ __status__ = "Production"
 sense = SenseHat()
 sense.clear()
 
-min_difference = 0.005
+min_difference = 0.01
 anomalies_detected = False
 anomalies = 0
 current_data = []
@@ -66,6 +66,7 @@ def send_maker_notification(stop_event):
                     'value3': round(current_data['z'], 5)
                     }
             maker_request.send('mov_detected', data)
+            time.sleep(30)
         
 def send_twitter_msg(stop_event):
     while True and not stop_event.is_set():
@@ -91,6 +92,26 @@ def do_before_exit():
     _logger.info('Exiting...')
     stop_event.set()
     sense.clear()
+
+def find_mean():
+    xx = []
+    yy = []
+    zz = []
+    for d in range(50):
+        x, y, z = sense.get_accelerometer_raw().values()
+        if abs(x) > 1.2: continue
+        if abs(y) > 1.2: continue
+        if abs(z) > 1.2: continue
+        xx.append(x)
+        yy.append(y)
+        zz.append(z)
+        time.sleep(0.01)
+    
+    x = sum(xx) / float(len(xx))
+    y = sum(yy) / float(len(yy))
+    z = sum(zz) / float(len(zz))
+
+    return { 'x': round(x, 5), 'y': round(y, 5), 'z': round(z, 5)}
     
 def run():
     global anomalies_detected
@@ -100,24 +121,30 @@ def run():
     mean_acc = sense.get_accelerometer_raw()
     anomalies = 0
     
-    while True:  
+    while True:
+        clean_data = True
         current_data = acc = sense.get_accelerometer_raw()
         d = (abs(mean_acc['x'] - acc['x']), 
              abs(mean_acc['y'] - acc['y']), 
              abs(mean_acc['z'] - acc['z']))
+        _logger.debug('%06.5f, %06.5f, %06.5f' % d)
         t = anomalies
         for val in d:
+            if val > 1:
+                _logger.debug('Rejecting data %s.' % val)
+                clean_data = False
+                break  # reject data
+
             if val > min_difference:
                 anomalies += 1
                 break
-        _logger.debug('%06.5f, %06.5f, %06.5f' % d)
-        if t == anomalies:
+        
+        if clean_data and t == anomalies:
             anomalies_detected = False
             anomalies = 0
-            mean_acc = acc
 
-        if anomalies >= 2:
-            _logger.debug('Anomalies detected')
+        if clean_data and anomalies >= 2:
+            _logger.debug('%s anomalies detected.' % anomalies)
             anomalies_detected = True
             log_to_file(acc)
             log_to_es(acc)
@@ -140,13 +167,15 @@ def main():
         #Thread(target=send_twitter_msg, args=(stop_event,)).start()
 
         # maker alert
-        Thread(target=send_maker_notification, args=(stop_event,)).start()
+        #Thread(target=send_maker_notification, args=(stop_event,)).start()
         
         # main thread
         run()
-    except (KeyboardInterrupt, SystemExit):
+
+        # do before normal exit
         do_before_exit()
-        
+    except (KeyboardInterrupt, SystemExit):
+        do_before_exit()        
         
 if __name__=='__main__':
     main()
