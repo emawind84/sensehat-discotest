@@ -41,7 +41,7 @@ def main():
             # added time zone because data on the csv file have offset
             timestamp = dateutil.parser.parse( data['timestamp'] + '+0900' )
             # format the date with the offset in order to index the correct date
-            data['timestamp'] = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
+            data['timestamp'] = timestamp.utcnow().strftime('%Y-%m-%dT%H:%M:%S.000Z')
             
             # let's prevent es from overwriting (creating new version) the same data if already exists
             # add the querystring: "op_type=create" to prevent from creating new version
